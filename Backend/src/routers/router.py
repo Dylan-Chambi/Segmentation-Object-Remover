@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from src.schemas.ImageSegmentation import ImageSegmentation
-from src.services.image_seg import get_image_obj_segments
+from src.services.image_seg import get_image_obj_segments, get_image_obj_segments_data
 from src.models.ObjectSegmentator import ObjectSegmentator
 
 
@@ -16,14 +16,17 @@ router = APIRouter()
 def root():
     return {"message": "Hello World from image_prediction_router"}
 
-@router.post("/predict")
+@router.post("/predict-image")
 def predict(image_segmentation: ImageSegmentation = Depends(), predictor: ObjectSegmentator = Depends(get_object_segmentator)):
-    try:
-        return get_image_obj_segments(
-            image_segmentation.image_file, image_segmentation.confidence_threshold, predictor
-        )
-    except Exception as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    return get_image_obj_segments(
+        image_segmentation.image_file, image_segmentation.confidence_threshold, predictor
+    )
+    
+@router.post("/predict-data")
+def predict_data(image_segmentation: ImageSegmentation = Depends(), predictor: ObjectSegmentator = Depends(get_object_segmentator)):
+    return get_image_obj_segments_data(
+        image_segmentation.image_file, image_segmentation.confidence_threshold, predictor
+    )
 
 
 @router.get("/reports")

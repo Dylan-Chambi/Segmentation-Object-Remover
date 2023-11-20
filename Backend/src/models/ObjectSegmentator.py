@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
 from .GeneralSegmentator import GeneralSegmentator
+from .SegmentationData import SegmentationInstanceData
 from src.utils.constants import MASK_ALPHA
 
 class ObjectSegmentator(GeneralSegmentator):
@@ -63,7 +64,7 @@ class ObjectSegmentator(GeneralSegmentator):
 
     def segment_image(self, image, confidence):
         # Read results
-        results = self.model.predict(image, conf=0.5)
+        results = self.model.predict(image, conf=confidence)
 
         class_ids = []
         scores = []
@@ -136,5 +137,11 @@ class ObjectSegmentator(GeneralSegmentator):
         for image in images_mask:
             image_pil.paste(image, (0, 0), image)
 
-        return image_pil
+        segmentation_instances = []
+
+        for class_id, score, polygon in zip(class_ids, scores, polygons):
+            inst = SegmentationInstanceData(class_name=str(class_id), seg_mask_polygon=np.array(polygon).tolist(), score=float(score))
+            segmentation_instances.append(inst)
+
+        return image_pil, segmentation_instances
     
