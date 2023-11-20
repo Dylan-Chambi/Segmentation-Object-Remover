@@ -1,12 +1,10 @@
 from fastapi import FastAPI
+from src.routers.router import router
 
 
 app = FastAPI(title="Clasts Prediction API")
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
+app.include_router(router, tags=["router"])
 
 if __name__ == "__main__":
     import uvicorn
