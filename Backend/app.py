@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from src.routers.router import router
 
 
-app = FastAPI(title="Clasts Prediction API")
+app = FastAPI(title="Image Background Remover API")
 
 app.include_router(router, tags=["router"])
 
