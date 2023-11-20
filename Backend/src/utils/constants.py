@@ -1,0 +1,1 @@
+MASK_ALPHA = 90

@@ -1,4 +1,33 @@
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, HTTPException, status, Response, Depends
+from src.models.ObjectSegmentator import ObjectSegmentator
+import io
+from PIL import Image
+import numpy as np
 
-def get_image_obj_segments(img_file: File, confidence: float):
-    return {"message": "Hello World from image_seg.py"}
+def get_image_obj_segments(img_file: UploadFile, confidence: float, predictor: ObjectSegmentator):
+    # Read the image file into a stream
+    img_stream = io.BytesIO(img_file.file.read())
+
+    # Check if the content type is an image
+    if img_file.content_type.split("/")[0] != "image":
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Not an image"
+        )
+
+    # Convert to a Pillow image
+    img_obj = Image.open(img_stream)
+
+    # Convert to a NumPy array
+    img_array = np.array(img_obj)
+
+    # Perform image segmentation using the provided predictor
+    seg_img_pil = predictor.segment_image(img_array, confidence)
+
+    # Save the segmented image to a stream in JPEG format
+    img_stream = io.BytesIO()
+    seg_img_pil.save(img_stream, format="JPEG")
+    img_stream.seek(0)
+
+    # Return the segmented image as a FastAPI Response
+    return Response(content=img_stream.read(), media_type="image/jpeg")
