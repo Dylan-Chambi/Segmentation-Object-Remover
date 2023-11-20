@@ -6,10 +6,13 @@ import random
 from .GeneralSegmentator import GeneralSegmentator
 from .SegmentationData import SegmentationInstanceData
 from src.utils.constants import MASK_ALPHA
+from src.config.config import get_settings
+
+SETTINGS = get_settings()
 
 class ObjectSegmentator(GeneralSegmentator):
     def __init__(self):
-        self.model = YOLO('./Backend/src/tf_models/yolov8m-seg.pt')
+        self.model = YOLO('./Backend/src/tf_models/' + SETTINGS.yolo_version)
         self.transparency = MASK_ALPHA
         super().__init__(self.model)
 
