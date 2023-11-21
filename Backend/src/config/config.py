@@ -11,5 +11,5 @@ class Settings(BaseSettings):
     csv_path: str = "Backend/src/utils/data.csv"
 
 @cache
-def get_settings():
+def get_settings() -> Settings:
     return Settings()

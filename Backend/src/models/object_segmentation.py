@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
 from .generaL_segmentation import GeneralSegmentator
-from .segmentation_data import SegmentationInstanceData
+from .segmentation_inst_data import SegmentationInstanceData
 from src.utils.constants import MASK_ALPHA
 from src.config.config import get_settings
 
@@ -21,7 +21,7 @@ class ObjectSegmentator(GeneralSegmentator):
     def model_info(self):
         return self.model.info()
 
-    def convert_to_transparency(self, image, background_color, transparency=0):
+    def convert_to_transparency(self, image: Image, background_color: tuple, transparency: int = 0) -> Image:
         # Convert the image to RGBA format
         image = image.convert("RGBA")
 
@@ -40,14 +40,14 @@ class ObjectSegmentator(GeneralSegmentator):
 
         return new_image
     
-    def get_class_colors(self, class_ids):
+    def get_class_colors(self, class_ids: list[str]) -> dict[str, tuple[int, int, int]]:
         class_colors = {}
         for class_id in class_ids:
             if class_id not in class_colors:
                 class_colors[class_id] = tuple(random.randint(0, 255) for _ in range(3))
         return class_colors
     
-    def draw_class_text(self, draw, polygon, class_id):
+    def draw_class_text(self, draw: ImageDraw, polygon: list[tuple[int, int]], class_id: str):
         # Convert floating points to integers
         polygon_int = [(int(p[0]), int(p[1])) for p in polygon]
 
@@ -60,7 +60,7 @@ class ObjectSegmentator(GeneralSegmentator):
         # Draw class text
         draw.text(text_position, class_id, fill=(255, 255, 255, 255), font=ImageFont.truetype("arial.ttf", 30))
 
-    def dilate_background_image(self, bg_img):
+    def dilate_background_image(self, bg_img: Image) -> Image:
         bg_img_array = np.array(bg_img)
         kernel = np.ones((5,5),np.uint8)
         bg_img_dilated = cv2.dilate(bg_img_array, kernel, iterations=2)
@@ -70,7 +70,7 @@ class ObjectSegmentator(GeneralSegmentator):
         img_inverted = ImageOps.invert(img)
         return self.convert_to_transparency(img_inverted, tuple(random.randint(0, 255) for _ in range(3)), self.transparency)
 
-    def segment_image(self, image, confidence):
+    def segment_image(self, image: np.ndarray, confidence: float):
         # Read results
         results = self.model.predict(image, conf=confidence)
 

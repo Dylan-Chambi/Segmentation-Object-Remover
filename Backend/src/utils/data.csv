@@ -2,3 +2,4 @@ file_name,image_size,prediction_type,datetime,execution_time,model,confidence_th
 image.jpg,54KB,IMAGE_SEGMENTATION,2023-11-21 03:21:03,2.9350390434265137,yolov8m-seg.pt,0.5
 food.jpg,112KB,IMAGE_SEGMENTATION,2023-11-21 03:43:11,3.0875022411346436,yolov8m-seg.pt,0.5
 food.jpg,223KB,IMAGE_DATA_SEG,2023-11-21 03:43:52,3.047372817993164,yolov8m-seg.pt,0.5
+food.jpg,112KB,IMAGE_SEGMENTATION,2023-11-21 03:57:38,3.079967975616455,yolov8m-seg.pt,0.5

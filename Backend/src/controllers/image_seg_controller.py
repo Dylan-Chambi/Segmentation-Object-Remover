@@ -1,6 +1,6 @@
-from fastapi import File, UploadFile, HTTPException, status, Response, Depends
+from fastapi import UploadFile, HTTPException, status, Response
 from src.models.object_segmentation import ObjectSegmentator
-from src.models.segmentation_data import SegmentationInstanceData
+from src.models.segmentation_inst_data import SegmentationInstanceData
 import io
 from PIL import Image
 import numpy as np
