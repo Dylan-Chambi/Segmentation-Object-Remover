@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from src.models.HTTPMethod import HTTPMethod
+from src.models.http_method import HTTPMethod
 
 class StatusEndpoints(BaseModel):
     path: str

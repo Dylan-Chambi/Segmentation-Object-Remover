@@ -1,5 +1,5 @@
-from src.schemas.StatusEndpoints import StatusEndpoints
-from src.models.HTTPMethod import HTTPMethod
+from src.schemas.status_endpoints import StatusEndpoints
+from src.models.http_method import HTTPMethod
 
 MODEL_DESCRIPTION = "This is a web service that allows you to segment objects in images using an Image Segmentation model like YOLOv8."
 

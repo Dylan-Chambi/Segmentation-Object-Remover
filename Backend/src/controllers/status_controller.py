@@ -1,6 +1,6 @@
-from src.models.ObjectSegmentator import ObjectSegmentator
-from src.schemas.Status import Status
-from src.schemas.StatusEndpoints import StatusEndpoints
+from src.models.object_segmentation import ObjectSegmentator
+from src.schemas.status import Status
+from src.schemas.status_endpoints import StatusEndpoints
 from src.config.config import get_settings
 from src.utils.data_info import MODEL_DESCRIPTION, SERVICE_ENDPOINTS
 

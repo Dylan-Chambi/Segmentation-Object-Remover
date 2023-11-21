@@ -1,4 +1,4 @@
-from src.services.CSVService import CSVService
+from src.services.csv_service import CSVService
 from fastapi.responses import StreamingResponse
 
 

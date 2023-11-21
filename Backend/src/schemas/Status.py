@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from src.schemas.StatusEndpoints import StatusEndpoints
+from src.schemas.status_endpoints import StatusEndpoints
 
 class Status(BaseModel):
     yolo_version: str

@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
-from .GeneralSegmentator import GeneralSegmentator
-from .SegmentationData import SegmentationInstanceData
+from .generaL_segmentation import GeneralSegmentator
+from .segmentation_data import SegmentationInstanceData
 from src.utils.constants import MASK_ALPHA
 from src.config.config import get_settings
 

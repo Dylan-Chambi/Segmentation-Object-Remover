@@ -1,13 +1,13 @@
 from fastapi import File, UploadFile, HTTPException, status, Response, Depends
-from src.models.ObjectSegmentator import ObjectSegmentator
-from src.models.SegmentationData import SegmentationInstanceData
+from src.models.object_segmentation import ObjectSegmentator
+from src.models.segmentation_data import SegmentationInstanceData
 import io
 from PIL import Image
 import numpy as np
 import time
-from src.services.CSVService import CSVService, CSVItem
+from src.services.csv_service import CSVService, CSVItem
 from src.utils.functions import human_size
-from src.models.ServiceType import ServiceType
+from src.models.service_type import ServiceType
 
 def get_image_obj_segments(img_file: UploadFile, confidence: float, predictor: ObjectSegmentator, csv_service: CSVService) -> Response:
     # Start counting the time
