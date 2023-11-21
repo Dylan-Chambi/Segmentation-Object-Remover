@@ -46,14 +46,16 @@ Asegúrate de tener instaladas las siguientes herramientas y bibliotecas antes d
 4. **Instalar las bibliotecas necesarias:**
     ```bash
     pip install -r Backend/requirements.txt
+    cd Frontend && npm install && cd ..
     ```
 
 5. **Ejecutar el proyecto:**
     ```bash
     python Backend/app.py
+    cd Frontend && npm run build && npm run start
     ```
 
-### Ejemplo de uso
+### Ejemplo de uso (Backend)
 
 - **Endpoint:** http://localhost:8000/status
     - **Method:** GET
@@ -103,3 +105,19 @@ Asegúrate de tener instaladas las siguientes herramientas y bibliotecas antes d
     - **Method:** GET
     - **Response:**
         ![image](./Images/reports-example.png)
+
+
+### Ejemplo de uso (Frontend)
+
+- **URL:** http://localhost:9000
+- **Steps guide:**
+    - **Step 1:** Seleccionar una imagen.
+        ![image](./Images/page-step-1.png)
+    - **Step 2:** Visualizar la imagen seleccionada.
+        ![image](./Images/page-step-2.png)
+    - **Step 3:** Visualización de los segmentos de objetos
+        ![image](./Images/page-step-3.png)
+    - **Step 4:** Selección de los objetos a remover
+        ![image](./Images/page-step-4.png)
+    - **Step 5:** Visualización de la imagen con los objetos removidos
+        ![image](./Images/page-step-5.png)
