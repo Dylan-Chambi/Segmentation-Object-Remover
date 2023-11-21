@@ -52,3 +52,54 @@ Asegúrate de tener instaladas las siguientes herramientas y bibliotecas antes d
     ```bash
     python Backend/app.py
     ```
+
+### Ejemplo de uso
+
+- **Endpoint:** http://localhost:8000/status
+    - **Method:** GET
+    - **Response:**
+        ![image](./Images/status-example.png)
+
+- **Endpoint:** http://localhost:8000/predict-image
+    - **Method:** POST
+    - **Body:**
+        - Imagen:
+            ![image](./Images/example-image.jpg)
+        - Valor de confianza: 0.5
+    - **Response:**
+        ![image](./Images/predict-image-example.png)
+
+- **Endpoint:** http://localhost:8000/predict-data
+    - **Method:** POST
+    - **Body:**
+        - Imagen:
+            ![image](./Images/example-image.jpg)
+        - Valor de confianza: 0.5
+    - **Response:**
+        ![image](./Images/predict-data-example.png)
+
+- **Endpoint:** http://localhost:8000/remove-items-bg
+    - **Method:** POST
+    - **Body:**
+        - Imagen:
+            ![image](./Images/example-image.jpg)
+        - Valor de confianza: 0.5
+        - Items a remover:
+            ```json
+            [
+                {
+                    "class_name": "background", 
+                    "instance_id": 1
+                }, 
+                {
+                    "class_name": "dog",
+                    "instance_id": 1
+                }
+            ]
+            ```        
+    - **Response:**
+        ![image](./Images/remove-bg-example.png)
+- **Endpoint:** http://localhost:8000/reports
+    - **Method:** GET
+    - **Response:**
+        ![image](./Images/reports-example.png)
