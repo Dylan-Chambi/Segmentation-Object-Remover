@@ -99,3 +99,51 @@ def get_image_obj_segments_data(img_file: UploadFile, confidence: float, predict
 
     # Return the segmented image data
     return seg_data
+
+
+def image_remove_items_from_list(img_file: UploadFile, confidence: float, items: list[str], predictor: ObjectSegmentator, csv_service: CSVService) -> Response:
+    # Start counting the time
+    start = time.time()
+
+    # Validate the confidence threshold
+    validate_confidence(confidence)
+
+    # Validate the image file
+    validate_image(img_file)
+
+
+    # Read the image file into a stream
+    img_stream = io.BytesIO(img_file.file.read())
+
+    # Convert to a Pillow image
+    img_obj = Image.open(img_stream)
+
+    # Convert to a NumPy array
+    img_array = np.array(img_obj)
+
+    # Perform image segmentation using the provided predictor
+    removed_img = predictor.remove_items_from_list(img_array, confidence, items)
+
+    # Save the segmented image to a stream in JPEG format
+    img_stream_masked = io.BytesIO()
+    removed_img.save(img_stream_masked, format="JPEG")
+    img_stream_masked.seek(0)
+
+    # End counting the time
+    end = time.time()
+
+    # Register into CSV
+    csv_service.write_csv(
+        CSVItem(
+            file_name=img_file.filename,
+            image_size=human_size(len(img_stream.getbuffer())),
+            prediction_type=ServiceType.IMAGE_REMOVE_ITEMS,
+            datetime=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            execution_time=end - start, 
+            model=predictor.model_name,
+            confidence_threshold=confidence
+        )
+    )
+
+    # Return the segmented image as a FastAPI Response
+    return Response(content=img_stream_masked.read(), media_type="image/jpeg")

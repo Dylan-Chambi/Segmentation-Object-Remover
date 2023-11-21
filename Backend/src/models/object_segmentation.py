@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 import random
+from src.schemas.image_rem_items import Item
 from .generaL_segmentation import GeneralSegmentator
 from .segmentation_inst_data import SegmentationInstanceData
 from src.utils.constants import MASK_ALPHA
@@ -75,6 +76,7 @@ class ObjectSegmentator(GeneralSegmentator):
         results = self.model.predict(image, conf=confidence)
 
         class_ids = []
+        instance_ids = []
         scores = []
         masks = []
         polygons = []
@@ -86,6 +88,8 @@ class ObjectSegmentator(GeneralSegmentator):
 
             for class_id in boxes.cls:
                 class_ids.append(result.names[int(class_id)])
+                class_count = class_ids.count(result.names[int(class_id)])
+                instance_ids.append(class_count)
 
             for conf in boxes.conf:
                 scores.append(conf)
@@ -138,8 +142,15 @@ class ObjectSegmentator(GeneralSegmentator):
 
         # Invert the colors of the background image
         bg_img = self.invert_and_transparency(bg_img)
-        images_mask.append(bg_img)
 
+        # Add background image to the list of images
+        class_ids.append("background")
+        instance_ids.append(1)
+        scores.append(1)
+        polygons.append([(0, 0), (0, width), (height, width), (height, 0)])
+        images_mask.append(bg_img)
+        images_mask_bin.append(bg_img)
+        
         # Place the images on the original image
         image_pil.convert("RGBA")
 
@@ -148,9 +159,84 @@ class ObjectSegmentator(GeneralSegmentator):
 
         segmentation_instances = []
 
-        for class_id, score, polygon in zip(class_ids, scores, polygons):
-            inst = SegmentationInstanceData(class_name=str(class_id), seg_mask_polygon=np.array(polygon).tolist(), score=float(score))
+        for class_id, instance_id, score, polygon in zip(class_ids, instance_ids, scores, polygons):
+            inst = SegmentationInstanceData(class_name=str(class_id), instance_id=instance_id, seg_mask_polygon=np.array(polygon).tolist(), score=float(score))
             segmentation_instances.append(inst)
 
         return image_pil, segmentation_instances
     
+    def remove_items_from_list(self, image: np.ndarray, confidence: float, item_list: list[Item]):
+        items_class_ids = [item.class_name for item in item_list]
+        items_instance_ids = [item.instance_id for item in item_list]
+        # Read results
+        results = self.model.predict(image, conf=confidence)
+
+        class_ids = []
+        instance_ids = []
+        scores = []
+        masks = []
+
+        for result in results:
+            boxes = result.boxes.cpu().numpy()
+
+            for class_id in boxes.cls:
+                class_ids.append(result.names[int(class_id)])
+                class_count = class_ids.count(result.names[int(class_id)])
+                instance_ids.append(class_count)
+
+            for conf in boxes.conf:
+                scores.append(conf)
+
+            if result.masks is not None and len(result.masks) > 0:
+                for mask in result.masks:
+                    masks.append(mask.data[0].numpy())
+
+        # Create a PIL image from the original image
+        image_pil = Image.fromarray(np.array(image), 'RGB')
+
+        # Scale masks to the size of the original image
+        height, width = image_pil.size
+
+        # Create a black background image
+        bg_img = np.zeros((width, height, 3), dtype=np.uint8)
+        bg_img = Image.fromarray(bg_img, 'RGB')
+
+        # Iterate over masks, class_ids, and instance_ids simultaneously
+        for mask, class_id, instance_id in zip(masks, class_ids, instance_ids):
+            if class_id in items_class_ids and instance_id in items_instance_ids:
+                # Convert mask to PIL image
+                to_delete_mask = np.array(mask * 255, dtype=np.uint8)
+                to_delete_mask_img = Image.fromarray(to_delete_mask, 'L').resize((height, width))
+
+                # Paste the original image over the black background using the inverted mask
+                image_pil.paste(bg_img, (0, 0), to_delete_mask_img)
+        
+        bg_img = np.zeros((width, height, 3), dtype=np.uint8)
+        bg_img = Image.fromarray(bg_img, 'RGB')
+
+        # Iterate over masks, polygons, and class_ids simultaneously
+        for mask, class_id in zip(masks, class_ids):
+            predicted_img = np.zeros((width, height, 3), dtype=np.uint8)
+            predicted_img = Image.fromarray(predicted_img, 'RGB')
+
+
+            mask_binary = np.array(mask * 255, dtype=np.uint8)
+            mask_img = Image.fromarray(mask_binary, 'L').resize((height, width))
+
+            predicted_img.paste(mask_img, (0, 0), mask_img)
+
+
+            bg_img.paste(mask_img, (0, 0), mask_img)
+
+        # Dilate the background image
+        bg_img = self.dilate_background_image(bg_img)
+
+        # Invert the colors of the background image
+        bg_img = ImageOps.invert(bg_img)
+        bg_img = self.convert_to_transparency(bg_img, (0, 0, 0), 255)
+
+        if "background" in items_class_ids:
+            # Remove the background mask from image
+            image_pil.paste(bg_img, (0, 0), bg_img)
+
+        return image_pil
