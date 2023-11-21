@@ -8,19 +8,20 @@ import time
 from src.services.csv_service import CSVService, CSVItem
 from src.utils.functions import human_size
 from src.models.service_type import ServiceType
+from src.middlewares.image_seg_middleware import validate_image, validate_confidence
 
 def get_image_obj_segments(img_file: UploadFile, confidence: float, predictor: ObjectSegmentator, csv_service: CSVService) -> Response:
     # Start counting the time
     start = time.time()
+
+    # Validate the confidence threshold
+    validate_confidence(confidence)
+    
+    # Validate the image file
+    validate_image(img_file)
+
     # Read the image file into a stream
     img_stream = io.BytesIO(img_file.file.read())
-
-    # Check if the content type is an image
-    if img_file.content_type.split("/")[0] != "image":
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Not an image"
-        )
 
     # Convert to a Pillow image
     img_obj = Image.open(img_stream)
@@ -32,9 +33,9 @@ def get_image_obj_segments(img_file: UploadFile, confidence: float, predictor: O
     seg_img_pil, _ = predictor.segment_image(img_array, confidence)
 
     # Save the segmented image to a stream in JPEG format
-    img_stream = io.BytesIO()
-    seg_img_pil.save(img_stream, format="JPEG")
-    img_stream.seek(0)
+    img_stream_masked = io.BytesIO()
+    seg_img_pil.save(img_stream_masked, format="JPEG")
+    img_stream_masked.seek(0)
 
 
     # End counting the time
@@ -55,21 +56,21 @@ def get_image_obj_segments(img_file: UploadFile, confidence: float, predictor: O
 
 
     # Return the segmented image as a FastAPI Response
-    return Response(content=img_stream.read(), media_type="image/jpeg")
+    return Response(content=img_stream_masked.read(), media_type="image/jpeg")
 
 
 def get_image_obj_segments_data(img_file: UploadFile, confidence: float, predictor: ObjectSegmentator, csv_service: CSVService) -> list[SegmentationInstanceData]:
     # Start counting the time
     start = time.time()
+
+    # Validate the confidence threshold
+    validate_confidence(confidence)
+
+    # Validate the image file
+    validate_image(img_file)
+
     # Read the image file into a stream
     img_stream = io.BytesIO(img_file.file.read())
-
-    # Check if the content type is an image
-    if img_file.content_type.split("/")[0] != "image":
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Not an image"
-        )
 
     # Convert to a Pillow image
     img_obj = Image.open(img_stream)

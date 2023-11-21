@@ -8,6 +8,8 @@ from src.models.object_segmentation import ObjectSegmentator
 from src.services.csv_service import CSVService
 from src.schemas.status import Status
 from src.models.segmentation_inst_data import SegmentationInstanceData
+from pydantic import ValidationError
+from fastapi import HTTPException, status
 
 
 def get_object_segmentator():

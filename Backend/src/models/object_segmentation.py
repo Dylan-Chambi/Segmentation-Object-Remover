@@ -90,9 +90,10 @@ class ObjectSegmentator(GeneralSegmentator):
             for conf in boxes.conf:
                 scores.append(conf)
 
-            for mask in result.masks:
-                masks.append(mask.data[0].numpy())
-                polygons.append(mask.xy[0])
+            if result.masks is not None and len(result.masks) > 0:
+                for mask in result.masks:
+                    masks.append(mask.data[0].numpy())
+                    polygons.append(mask.xy[0])
 
         # Create a PIL image from the original image
         image_pil = Image.fromarray(np.array(image), 'RGB')
