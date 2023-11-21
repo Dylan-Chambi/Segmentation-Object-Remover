@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     
     api_name: str = "Image Background Remover API"
     revision: str = "local"
-    yolo_version: str = "yolov8m.pt" # El modelo a cargar debe estar en Backend/src/tf_models/
+    yolo_version: str = "yolov8m-seg.pt" # El modelo a cargar debe estar en Backend/src/tf_models/
     log_level: str = "DEBUG"
 
 

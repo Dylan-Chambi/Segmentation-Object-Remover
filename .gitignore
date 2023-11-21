@@ -5,3 +5,5 @@ Frontend/**
 *.png
 
 __pycache__/
+
+.vscode/**

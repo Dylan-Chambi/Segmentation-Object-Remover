@@ -16,6 +16,10 @@ class ObjectSegmentator(GeneralSegmentator):
         self.transparency = MASK_ALPHA
         super().__init__(self.model)
 
+
+    def model_info(self):
+        return self.model.info()
+
     def convert_to_transparency(self, image, background_color, transparency=0):
         # Convert the image to RGBA format
         image = image.convert("RGBA")
