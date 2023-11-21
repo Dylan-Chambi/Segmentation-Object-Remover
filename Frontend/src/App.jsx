@@ -26,7 +26,7 @@ function App() {
     const formData = new FormData()
     formData.append('image_file', file)
 
-    const dataImage = await fetch(`http://127.0.0.1:7000/predict-image?confidence_threshold=${threshold}`, {
+    const dataImage = await fetch(`http://127.0.0.1:3000/predict-image?confidence_threshold=${threshold}`, {
       method: 'POST',
       body: formData
     });
@@ -35,7 +35,7 @@ function App() {
     setProcessedImage(imageFile)
 
 
-    const data = await fetch(`http://127.0.0.1:7000/predict-data?confidence_threshold=${threshold}`, {
+    const data = await fetch(`http://127.0.0.1:3000/predict-data?confidence_threshold=${threshold}`, {
       method: 'POST',
       body: formData
     });
@@ -57,7 +57,7 @@ function App() {
     console.log(filtered)
     formData.append('items', JSON.stringify(filtered))
 
-    const dataImage = await fetch('http://127.0.0.1:7000/remove-items-image', {
+    const dataImage = await fetch('http://127.0.0.1:3000/remove-items-image', {
       method: 'POST',
       body: formData
     });
