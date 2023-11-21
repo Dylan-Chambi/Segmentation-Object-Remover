@@ -13,7 +13,7 @@ SETTINGS = get_settings()
 class ObjectSegmentator(GeneralSegmentator):
     def __init__(self):
         self.model_name = SETTINGS.yolo_version
-        self.model = YOLO('./Backend/src/tf_models/' + SETTINGS.yolo_version)
+        self.model = YOLO('./Backend/src/segmentation_models/' + SETTINGS.yolo_version)
         self.transparency = MASK_ALPHA
         super().__init__(self.model)
 
