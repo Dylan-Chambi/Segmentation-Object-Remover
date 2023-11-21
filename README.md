@@ -54,6 +54,10 @@ Asegúrate de tener instaladas las siguientes herramientas y bibliotecas antes d
     python Backend/app.py
     cd Frontend && npm run build && npm run start
     ```
+    o
+    ```bash
+    (python Backend/app.py) & (cd Frontend && npm run build && npm run start)
+    ```
 
 ### Ejemplo de uso (Backend)
 
