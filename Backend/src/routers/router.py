@@ -1,6 +1,7 @@
 # /src/routers/image_prediction.py
 
 from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.responses import StreamingResponse
 from src.schemas.ImageSegmentation import ImageSegmentation
 from src.controllers.image_seg import get_image_obj_segments, get_image_obj_segments_data
 from src.controllers.status import get_service_status
@@ -36,5 +37,5 @@ def predict_data(image_segmentation: ImageSegmentation = Depends(), predictor: O
 
 
 @router.get("/reports")
-def reports():
-    return get_reports()
+def reports(csv_service: CSVService = Depends(get_csv_service)) -> StreamingResponse:
+    return get_reports(csv_service)

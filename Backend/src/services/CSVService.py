@@ -1,6 +1,9 @@
 import csv
 import os
-from functools import cache
+import time
+
+from fastapi import HTTPException
+from fastapi.responses import StreamingResponse
 from src.config.config import get_settings
 
 SETTINGS = get_settings()
@@ -40,3 +43,16 @@ class CSVService():
             reader = csv.reader(f)
             data = list(reader)
         return data
+    
+    def get_csv_file(self) -> StreamingResponse:
+        if not os.path.exists(self.csv_path):
+            raise HTTPException(status_code=404, detail="CSV file not found")
+        
+        with open(self.csv_path, mode="r", encoding="utf-8") as file:
+            csv_data = file.read()
+
+        response = StreamingResponse(iter([csv_data]), media_type="text/csv")
+
+        response.headers["Content-Disposition"] = f'attachment; filename="report-{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}.csv"'
+        
+        return response

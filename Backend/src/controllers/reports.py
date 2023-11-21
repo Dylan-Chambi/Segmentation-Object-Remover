@@ -1,5 +1,6 @@
+from src.services.CSVService import CSVService
+from fastapi.responses import StreamingResponse
 
 
-
-def get_reports():
-    return {"message": "Hello World from reports_router"}
+def get_reports(csv_service: CSVService) -> StreamingResponse:
+    return csv_service.get_csv_file()
