@@ -17,6 +17,7 @@ Asegúrate de tener instaladas las siguientes herramientas y bibliotecas antes d
 
 - [Python](https://www.python.org/): 3.10 o superior.
 - [Requirements.txt](https://github.com/Dylan-Chambi/Segmentation-Object-Remover/blob/main/Backend/requirements.txt): Archivo que contiene todas las bibliotecas necesarias para ejecutar el proyecto.
+- Node JS: 18 o superior
 
 ## Pasos para ejecutar el proyecto
 
