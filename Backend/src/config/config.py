@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     revision: str = "local"
     yolo_version: str = "yolov8m-seg.pt" # El modelo a cargar debe estar en Backend/src/tf_models/
     log_level: str = "DEBUG"
-
+    csv_path: str = "Backend/src/utils/data.csv"
 
 @cache
 def get_settings():
