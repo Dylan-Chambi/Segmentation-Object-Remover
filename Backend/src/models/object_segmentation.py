@@ -54,18 +54,12 @@ class ObjectSegmentator(GeneralSegmentator):
 
         # Calculate position for text
         text_position = (
-            polygon_int[0][0] + (polygon_int[1][0] - polygon_int[0][0]) // 2,
+            polygon_int[0][0] + (polygon_int[1][0] - polygon_int[0][0]) // 2 - 5,
             polygon_int[0][1] + (polygon_int[2][1] - polygon_int[0][1]) // 2
         )
 
         # Draw class text
-        draw.text(text_position, class_id, fill=(255, 255, 255, 255), font=ImageFont.truetype("arial.ttf", 30))
-
-    def dilate_background_image(self, bg_img: Image) -> Image:
-        bg_img_array = np.array(bg_img)
-        kernel = np.ones((5,5),np.uint8)
-        bg_img_dilated = cv2.dilate(bg_img_array, kernel, iterations=2)
-        return Image.fromarray(bg_img_dilated, 'RGB')
+        draw.text(text_position, class_id, fill=(255, 0, 0, 255), font=ImageFont.truetype("arial.ttf", 15))
     
     def invert_and_transparency(self, img):
         img_inverted = ImageOps.invert(img)
@@ -137,9 +131,6 @@ class ObjectSegmentator(GeneralSegmentator):
 
             images_mask.append(image_result)
 
-        # Dilate the background image
-        bg_img = self.dilate_background_image(bg_img)
-
         # Invert the colors of the background image
         bg_img = self.invert_and_transparency(bg_img)
 
@@ -166,8 +157,6 @@ class ObjectSegmentator(GeneralSegmentator):
         return image_pil, segmentation_instances
     
     def remove_items_from_list(self, image: np.ndarray, confidence: float, item_list: list[Item]):
-        items_class_ids = [item.class_name for item in item_list]
-        items_instance_ids = [item.instance_id for item in item_list]
         # Read results
         results = self.model.predict(image, conf=confidence)
 
@@ -203,7 +192,8 @@ class ObjectSegmentator(GeneralSegmentator):
 
         # Iterate over masks, class_ids, and instance_ids simultaneously
         for mask, class_id, instance_id in zip(masks, class_ids, instance_ids):
-            if class_id in items_class_ids and instance_id in items_instance_ids:
+            current_item = Item(class_name=class_id, instance_id=instance_id)
+            if current_item in item_list:
                 # Convert mask to PIL image
                 to_delete_mask = np.array(mask * 255, dtype=np.uint8)
                 to_delete_mask_img = Image.fromarray(to_delete_mask, 'L').resize((height, width))
@@ -228,14 +218,11 @@ class ObjectSegmentator(GeneralSegmentator):
 
             bg_img.paste(mask_img, (0, 0), mask_img)
 
-        # Dilate the background image
-        bg_img = self.dilate_background_image(bg_img)
-
         # Invert the colors of the background image
         bg_img = ImageOps.invert(bg_img)
         bg_img = self.convert_to_transparency(bg_img, (0, 0, 0), 255)
 
-        if "background" in items_class_ids:
+        if "background" in [item.class_name for item in item_list]:
             # Remove the background mask from image
             image_pil.paste(bg_img, (0, 0), bg_img)
 
