@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import backendAPI from './config/backendAPI'
 
 function App() {
   const [isLoading, setIsLoading] = useState(false)
@@ -18,53 +19,66 @@ function App() {
 
 
   const handleUpload = async () => {
-    setIsLoading(true)
-    setProcessedImage(null)
-    setProcessedData(null)
-    setRemovedObjImg(null)
-    setSelectedObjects([])
-    const formData = new FormData()
-    formData.append('image_file', file)
+    try {
+      setIsLoading(true)
+      setProcessedImage(null)
+      setProcessedData(null)
+      setRemovedObjImg(null)
+      setSelectedObjects([])
+      const formData = new FormData()
+      formData.append('image_file', file)
 
-    const dataImage = await fetch(`http://127.0.0.1:3000/predict-image?confidence_threshold=${threshold}`, {
-      method: 'POST',
-      body: formData
-    });
+      const dataImage = await backendAPI.post('/predict-image', formData, {
+        params: {
+          confidence_threshold: threshold
+        },
+        responseType: 'blob'
+      })
 
-    const imageFile = await dataImage.blob()
-    setProcessedImage(imageFile)
+      const imageFile = await dataImage.data;
+      setProcessedImage(imageFile)
 
 
-    const data = await fetch(`http://127.0.0.1:3000/predict-data?confidence_threshold=${threshold}`, {
-      method: 'POST',
-      body: formData
-    });
+      const data = await backendAPI.post('/predict-data', formData, {
+        params: {
+          confidence_threshold: threshold
+        }
+      })
 
-    const dataJson = await data.json()
-    setProcessedData(dataJson)
-    console.log(dataJson)
-    setIsLoading(false)
+      console.log("data", data)
+
+      const dataJson = await data.data;
+      setProcessedData(dataJson)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
 
   const handleUploadRemovedObj = async () => {
-    setIsLoading(true)
-    setRemovedObjImg(null)
-    const formData = new FormData()
-    formData.append('image_file', file)
-    formData.append('confidence_threshold', threshold)
-    const filtered  = processedData.filter((data) => selectedObjects.includes(data.class_name + data.instance_id))
-    console.log(filtered)
-    formData.append('items', JSON.stringify(filtered))
+    try {
+      setIsLoading(true)
+      setRemovedObjImg(null)
+      const formData = new FormData()
+      formData.append('image_file', file)
+      formData.append('confidence_threshold', threshold)
+      const filtered  = processedData.filter((data) => selectedObjects.includes(data.class_name + data.instance_id))
+      console.log(filtered)
+      formData.append('items', JSON.stringify(filtered))
 
-    const dataImage = await fetch('http://127.0.0.1:3000/remove-items-image', {
-      method: 'POST',
-      body: formData
-    });
+      const dataImage = await backendAPI.post('/remove-items-image', formData, {
+        responseType: 'blob'
+      })
 
-    const imageFile = await dataImage.blob()
-    setRemovedObjImg(imageFile)
-    setIsLoading(false)
+      const imageFile = await dataImage.data;
+      setRemovedObjImg(imageFile)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const setSelectButton = (data) => {
@@ -101,8 +115,10 @@ function App() {
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '10px' }}>
                 <h4>Select the objects that you want to remove</h4>
-                {processedData?.map((data) => (
-                  <button onClick={() => setSelectButton(data)}
+                {processedData?.map((data, index) => (
+                  <button 
+                    key={index}
+                    onClick={() => setSelectButton(data)}
                     style={{
                       backgroundColor: selectedObjects.includes(data.class_name + data.instance_id) ? 'red' : 'white',
                       color: selectedObjects.includes(data.class_name + " " + data.instance_id) ? 'white' : 'black',

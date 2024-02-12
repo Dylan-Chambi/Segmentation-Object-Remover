@@ -1,0 +1,9 @@
+# Build a vite + react app
+FROM node:18-alpine as development
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN --mount=type=cache,target=/root/.npm \
+    npm install

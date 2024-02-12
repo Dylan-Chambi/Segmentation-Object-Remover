@@ -4,5 +4,8 @@ pydantic
 pydantic_settings
 numpy
 Pillow
-ultralytics
 python-multipart
+torch==2.2.0+cpu
+torchvision==0.17.0+cpu
+ultralytics
+--extra-index-url https://download.pytorch.org/whl/cpu

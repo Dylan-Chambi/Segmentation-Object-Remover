@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=${BACKEND_PORT}
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    mem_limit: 2GB
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL : ${BACKEND_URL}
+        BACKEND_PORT: ${BACKEND_PORT}
+        FRONTEND_HOST: ${FRONTEND_HOST}
+        FRONTEND_PORT: ${FRONTEND_PORT}
+        BASE_PATH: ${BASE_PATH}
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    mem_limit: 256MB

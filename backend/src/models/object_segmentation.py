@@ -1,3 +1,4 @@
+import os
 from ultralytics import YOLO
 import cv2
 import numpy as np
@@ -14,7 +15,7 @@ SETTINGS = get_settings()
 class ObjectSegmentator(GeneralSegmentator):
     def __init__(self):
         self.model_name = SETTINGS.yolo_version
-        self.model = YOLO('./Backend/src/segmentation_models/' + SETTINGS.yolo_version)
+        self.model = YOLO(os.path.abspath(os.getcwd()) + '/src/segmentation_models/' + SETTINGS.yolo_version)
         self.transparency = MASK_ALPHA
         super().__init__(self.model)
 
@@ -58,8 +59,10 @@ class ObjectSegmentator(GeneralSegmentator):
             polygon_int[0][1] + (polygon_int[2][1] - polygon_int[0][1]) // 2
         )
 
+        font_path = os.path.abspath(os.getcwd()) + '/src/fonts/arial.ttf'
+
         # Draw class text
-        draw.text(text_position, class_id, fill=(255, 0, 0, 255), font=ImageFont.truetype("arial.ttf", 15))
+        draw.text(text_position, class_id, fill=(255, 0, 0, 255), font=ImageFont.truetype(font_path, 20))
     
     def invert_and_transparency(self, img):
         img_inverted = ImageOps.invert(img)

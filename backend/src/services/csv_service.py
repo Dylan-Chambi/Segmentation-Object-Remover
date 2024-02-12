@@ -29,6 +29,7 @@ class CSVService():
 
         # create csv file if not exists
         if not os.path.exists(self.csv_path):
+            os.makedirs(os.path.dirname(self.csv_path), exist_ok=True)
             with open(self.csv_path, "a") as f:
                 f.write(",".join(self.csv_headers) + "\n")
         
